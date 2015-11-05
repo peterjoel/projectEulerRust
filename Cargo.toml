@@ -1,0 +1,10 @@
+[package]
+name = "euler"
+version = "0.1.0"
+authors = ["peter <peter.hall@algomi.com>"]
+
+
+[dependencies]
+primal = "0.2.3"
+num = "0.1.27"
+time = "0.1"
