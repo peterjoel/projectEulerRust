@@ -3,14 +3,18 @@
 extern crate num;
 extern crate primal;
 extern crate time;
-
+// utils
 mod fib;
+mod grid;
+// problems
 mod problem0001;
 mod problem0002;
 mod problem0003;
+// skip!
+mod problem0011;
 
 // cheap switch
-use problem0003::{run};
+use problem0011::{run};
 
 
 fn main() {
