@@ -13,40 +13,38 @@ or diagonally) in the 20×20 grid?
 
 */
 use std::fs::File;
-use std::result::Result;
 use std::io::Read;
-use std::io::Error;
-use std::io::ErrorKind;
-use grid::Grid;
+use grid::{Grid,Result};
+use grid;
 
-pub fn run() -> Result<u32, Error> {
+pub fn run() -> Result<u32> {
     load_text("data/problem0011.txt")
         .and_then( |s| s.parse::<Grid>() )
         .and_then( largest_product )
 }
 
-fn largest_product( grid : Grid ) -> Result<u32, Error> {
+fn largest_product( grid : Grid ) -> Result<u32> {
     let run_size = 4;
-    let rows = grid.rows();
-    rows.iter()
+    grid.rows().iter()
         .chain( grid.cols().iter() )
-        .chain( grid.diag_se().iter().filter( |r| r.len() >= run_size ))
-        .chain( grid.diag_sw().iter().filter( |r| r.len() >= run_size ))
+        .chain( grid.diag_se().iter() )
+        .chain( grid.diag_sw().iter() )
+        .filter( |row| row.len() >= run_size )
         .flat_map( |row|
                 (0..row.len() - run_size + 1)
                     .map( move |i| {
-                        row[i..i+run_size].iter()
-                            .fold(1u32, |prod,x| prod * (*x as u32))
+                        row[i .. i + run_size ].iter()
+                            .fold(1, |prod,x| prod * (*x as u32))
                     })
         )
         .max()
-        .ok_or(Error::new(ErrorKind::Other, "All rows must be same lenth.".to_owned() ))
+        .ok_or( grid::err( "The grid was too small." ))
 }
 
 
-fn load_text( location : &str ) -> Result<String, Error> {
-    let mut s = String::new();
+fn load_text( location : &str ) -> Result<String> {
+    let mut text = String::new();
     File::open( location )
-        .and_then( |mut f| f.read_to_string(&mut s))
-        .and_then( |_| Ok(s))
+        .and_then( |mut f| f.read_to_string(&mut text))
+        .and_then( |_| Ok(text))
 }

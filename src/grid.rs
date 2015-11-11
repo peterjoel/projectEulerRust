@@ -26,7 +26,7 @@ impl Grid {
                 Ok(Grid{ raw : data })
             }
             else {
-                Err( err("All rows must be same lenth."))
+                Err( err("All rows must be same length."))
             }
         }
     }
