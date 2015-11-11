@@ -1,28 +1,32 @@
-use std::result::Result;
+use std::result;
 use std::io::Error;
 use std::io::ErrorKind;
 use std::str::FromStr;
-// use std::cmp::{min, max};
 
 pub type Item = u8;
-pub type Row = Vec<Item>;
 
 #[derive(Debug)]
 pub struct Grid {
-    raw : Vec<Row>
+    raw : Vec<Vec<Item>>
+}
+
+pub type Result<A> = result::Result<A, Error>;
+
+pub fn err( msg : &str ) -> Error {
+    Error::new(ErrorKind::Other, msg.to_owned() )
 }
 
 impl Grid {
-    pub fn create( data: Vec<Row> ) -> Result<Grid, Error> {
+    pub fn create( data: Vec<Vec<Item>> ) -> Result<Grid> {
         if data.len() == 0 {
-            Err(Error::new(ErrorKind::Other, "No data!".to_owned()))
+            Err( err( "No data!" ))
         }
         else {
             if data.iter().all( |row| row.len() == data[0].len()) {
                 Ok(Grid{ raw : data })
             }
             else {
-                Err( Error::new(ErrorKind::Other, "All rows must be same lenth.".to_owned() ))
+                Err( err("All rows must be same lenth."))
             }
         }
     }
@@ -33,29 +37,29 @@ impl Grid {
     pub fn height( &self ) -> usize {
         self.rows().len()
     }
-    pub fn rows( &self ) -> Vec<Row> {
+    pub fn rows( &self ) -> Vec<Vec<Item>> {
         self.raw.to_owned()
     }
-    pub fn cols( &self ) -> Vec<Row> {
+    pub fn cols( &self ) -> Vec<Vec<Item>> {
         let mut cols = Vec::new();
         for i in 0..self.height() {
             let col = self.rows().iter()
                         .map( |row| row[i] )
-                        .collect::<Row>();
+                        .collect::<Vec<Item>>();
             cols.push(col);
         }
         cols
     }
 
-    pub fn diag_se( &self )  -> Vec<Row> {
+    pub fn diag_se( &self )  -> Vec<Vec<Item>> {
         self.calc_diag( true )
     }
 
-    pub fn diag_sw( &self )  -> Vec<Row> {
+    pub fn diag_sw( &self )  -> Vec<Vec<Item>> {
         self.calc_diag( false )
     }
 
-    fn calc_diag( &self, down_right: bool) -> Vec<Row> {
+    fn calc_diag( &self, down_right: bool) -> Vec<Vec<Item>> {
 
         let w = self.width() as i32;
         let h = self.height() as i32;
@@ -75,46 +79,30 @@ impl Grid {
             }
             diag.push( diag_line );
         }
-
-
         diag
-
-
-    //    1 2 3 4
-    //    1 2 3 4
-    //    1 2 3 4
-    // diagonal \
-    //         . . 1 2 3 4
-    //         . 1 2 3 4 .
-    //         1 2 3 4 . .
-    // diagonal /
-    //         1 2 3 4 . .
-    //         . 1 2 3 4 .
-    //         . . 1 2 3 4
-
     }
 }
 
 impl FromStr for Grid {
     type Err = Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self> {
         parse_grid( s.to_owned() )
     }
 }
 
-fn parse_grid( text : String ) -> Result<Grid, Error> {
+fn parse_grid( text : String ) -> Result<Grid> {
     text.lines()
             .map( |s| s.to_owned() )
             .map( parse_row )
-            .collect::<Result<Vec<_>, _>>()
+            .collect::<Result<Vec<_>>>()
             .and_then( Grid::create )
 }
 
-fn parse_row( text : String ) -> Result<Row, Error> {
+fn parse_row( text : String ) -> Result<Vec<Item>> {
     text.split(" ")
         .map(|s| s.to_owned()
             .parse::<Item>()
-            .map_err( |e| Error::new(ErrorKind::Other, e.to_string() ))
+            .map_err( |e| err( &e.to_string()[..] ))
         )
-        .collect::<Result<Row,_>>()
+        .collect::<Result<Vec<Item>>>()
 }
