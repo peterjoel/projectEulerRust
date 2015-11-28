@@ -2,11 +2,11 @@ use std::result;
 use std::io::Error;
 use std::io::ErrorKind;
 use std::str::FromStr;
-
-pub type Item = u8;
+use std::fmt::Debug;
+use std::fmt::Display;
 
 #[derive(Debug)]
-pub struct Grid {
+pub struct Grid<Item : Copy> {
     raw : Vec<Vec<Item>>
 }
 
@@ -16,8 +16,11 @@ pub fn err( msg : &str ) -> Error {
     Error::new(ErrorKind::Other, msg.to_owned() )
 }
 
-impl Grid {
-    pub fn create( data: Vec<Vec<Item>> ) -> Result<Grid> {
+impl <Item> Grid <Item>
+    where Item : Copy + Debug + FromStr + Display
+{
+
+    pub fn create( data: Vec<Vec<Item>> ) -> Result<Grid<Item>> {
         if data.len() == 0 {
             Err( err( "No data!" ))
         }
@@ -83,14 +86,22 @@ impl Grid {
     }
 }
 
-impl FromStr for Grid {
+impl <Item> FromStr for Grid<Item>
+    where
+        Item : Copy + Debug + Display + FromStr,
+        Item::Err : Display
+{
     type Err = Error;
     fn from_str(s: &str) -> Result<Self> {
         parse_grid( s.to_owned() )
     }
 }
 
-fn parse_grid( text : String ) -> Result<Grid> {
+fn parse_grid<Item>( text : String ) -> Result<Grid<Item>>
+    where
+        Item : Copy + Debug + Display + FromStr,
+        Item::Err : Display
+{
     text.lines()
             .map( |s| s.to_owned() )
             .map( parse_row )
@@ -98,7 +109,11 @@ fn parse_grid( text : String ) -> Result<Grid> {
             .and_then( Grid::create )
 }
 
-fn parse_row( text : String ) -> Result<Vec<Item>> {
+fn parse_row<Item>( text : String ) -> Result<Vec<Item>>
+    where
+        Item : Copy + Debug + Display + FromStr,
+        Item::Err : Display
+{
     text.split(" ")
         .map(|s| s.to_owned()
             .parse::<Item>()

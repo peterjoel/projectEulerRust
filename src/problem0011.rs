@@ -17,13 +17,15 @@ use std::io::Read;
 use grid::{Grid,Result};
 use grid;
 
+type Item = u8;
+
 pub fn run() -> Result<u32> {
     load_text("data/problem0011.txt")
-        .and_then( |s| s.parse::<Grid>() )
+        .and_then( |s| s.parse::<Grid<Item>>() )
         .and_then( largest_product )
 }
 
-fn largest_product( grid : Grid ) -> Result<u32> {
+fn largest_product( grid : Grid<Item> ) -> Result<u32> {
     let run_size = 4;
     grid.rows().iter()
         .chain( grid.cols().iter() )
