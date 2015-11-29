@@ -27,10 +27,10 @@ pub fn run() -> Result<u32> {
 
 fn largest_product( grid : Grid<Item> ) -> Result<u32> {
     let run_size = 4;
-    grid.rows().iter()
-        .chain( grid.cols().iter() )
-        .chain( grid.diag_se().iter() )
-        .chain( grid.diag_sw().iter() )
+    grid.rows()
+        .chain( grid.cols() )
+        .chain( grid.diag_se() )
+        .chain( grid.diag_sw() )
         .filter( |row| row.len() >= run_size )
         .flat_map( |row|
                 (0..row.len() - run_size + 1)

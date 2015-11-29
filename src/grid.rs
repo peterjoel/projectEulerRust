@@ -4,11 +4,14 @@ use std::io::ErrorKind;
 use std::str::FromStr;
 use std::fmt::Debug;
 use std::fmt::Display;
+use std::vec::IntoIter;
 
 #[derive(Debug)]
 pub struct Grid<Item : Copy> {
     raw : Vec<Vec<Item>>
 }
+
+pub type Iter<A> = IntoIter<A>;
 
 pub type Result<A> = result::Result<A, Error>;
 
@@ -35,40 +38,40 @@ impl <Item> Grid <Item>
     }
 
     pub fn width( &self ) -> usize {
-        self.rows()[0].len()
+        self.raw[0].len()
     }
     pub fn height( &self ) -> usize {
-        self.rows().len()
+        self.raw.len()
     }
-    pub fn rows( &self ) -> Vec<Vec<Item>> {
-        self.raw.to_owned()
+
+    pub fn rows( &self ) -> Iter<Vec<Item>> {
+        self.raw.to_owned().into_iter()
     }
-    pub fn cols( &self ) -> Vec<Vec<Item>> {
+
+    pub fn cols( &self ) -> Iter<Vec<Item>> {
         let mut cols = Vec::new();
         for i in 0..self.height() {
-            let col = self.rows().iter()
+            let col = self.rows()
                         .map( |row| row[i] )
                         .collect::<Vec<Item>>();
             cols.push(col);
         }
-        cols
+        cols.into_iter()
     }
 
-    pub fn diag_se( &self )  -> Vec<Vec<Item>> {
+    pub fn diag_se( &self ) -> Iter<Vec<Item>> {
         self.calc_diag( true )
     }
 
-    pub fn diag_sw( &self )  -> Vec<Vec<Item>> {
+    pub fn diag_sw( &self ) -> Iter<Vec<Item>> {
         self.calc_diag( false )
     }
 
-    fn calc_diag( &self, down_right: bool) -> Vec<Vec<Item>> {
+    fn calc_diag( &self, down_right: bool) -> Iter<Vec<Item>> {
 
         let w = self.width() as i32;
         let h = self.height() as i32;
-
         let mut diag = Vec::new();
-
         let x_starts = if down_right { 1-h..w } else { 0..w+h-1 };
 
         for x in x_starts {
@@ -82,7 +85,7 @@ impl <Item> Grid <Item>
             }
             diag.push( diag_line );
         }
-        diag
+        diag.into_iter()
     }
 }
 
