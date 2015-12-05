@@ -14,8 +14,8 @@ or diagonally) in the 20×20 grid?
 */
 use std::fs::File;
 use std::io::Read;
-use grid::{Grid,Result};
-use grid;
+use util::grid::{Grid,Result};
+use util::grid::error;
 
 type Item = u8;
 
@@ -40,7 +40,7 @@ fn largest_product( grid : Grid<Item> ) -> Result<u32> {
                     })
         )
         .max()
-        .ok_or( grid::err( "The grid was too small." ))
+        .ok_or( error::err( "The grid was too small." ))
 }
 
 

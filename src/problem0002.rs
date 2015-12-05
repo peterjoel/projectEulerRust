@@ -8,7 +8,7 @@ By considering the terms in the Fibonacci sequence whose values do not exceed fo
 million, find the sum of the even-valued terms.
 */
 
-use fib::{Fib};
+use util::fib::{Fib};
 
 pub fn run() -> u32 {
 

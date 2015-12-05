@@ -3,9 +3,9 @@
 extern crate num;
 extern crate primal;
 extern crate time;
-// utils
-mod fib;
-mod grid;
+
+mod util;
+
 // problems
 mod problem0001;
 mod problem0002;
