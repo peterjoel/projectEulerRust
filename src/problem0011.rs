@@ -20,21 +20,17 @@ use grid;
 type Item = u8;
 
 pub fn run() -> Result<u32> {
-    load_text("data/problem0011_small.txt")
+    load_text("data/problem0011.txt")
         .and_then( |s| s.parse::<Grid<Item>>() )
         .and_then( largest_product )
 }
 
 fn largest_product( grid : Grid<Item> ) -> Result<u32> {
     let run_size = 4;
-    // grid.row_iter()
-    //     .chain( grid.col_iter() )
-    //     .chain( grid.diag_se_iter() )
-    //     .chain( grid.diag_sw_iter() )
     grid.rows()
         .chain( grid.cols() )
-        .chain( grid.diag_se() )
-        .chain( grid.diag_sw() )
+        .chain( grid.diags_down_left() )
+        .chain( grid.diags_down_right() )
         .filter( |row| row.len() >= run_size )
         .flat_map( |row|
                 (0..row.len() - run_size + 1)

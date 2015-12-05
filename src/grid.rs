@@ -20,7 +20,6 @@ pub fn err( msg : &str ) -> Error {
 }
 
 
-
 impl <Item> Grid <Item>
     where Item : Copy + Debug + FromStr + Display
 {
@@ -46,77 +45,19 @@ impl <Item> Grid <Item>
         self.raw.len()
     }
 
-    pub fn rows( &self ) -> Iter<Vec<Item>> {
-        self.raw.to_owned().into_iter()
-    }
-    //
-    //
-    // pub fn corners( &self ) -> CornersIter<Item> {
-    //     CornersIter::new( &self )
-    // }
-
-
-    pub fn cols( &self ) -> Iter<Vec<Item>> {
-        let mut cols = Vec::new();
-        for i in 0..self.height() {
-            let col = self.rows()
-                        .map( |row| row[i] )
-                        .collect::<Vec<Item>>();
-            cols.push(col);
-        }
-        cols.into_iter()
-    }
-
-    pub fn diag_se( &self ) -> Iter<Vec<Item>> {
-        self.calc_diag( DiagDir::DownRight )
-    }
-
-    pub fn diag_sw( &self ) -> Iter<Vec<Item>> {
-        self.calc_diag( DiagDir::DownLeft )
-    }
-
-    fn calc_diag( &self, direction:DiagDir) -> Iter<Vec<Item>> {
-
-        let w = self.width() as i32;
-        let h = self.height() as i32;
-        let mut diag = Vec::new();
-        let x_starts = match direction {
-            DiagDir::DownRight => 1-h..w,
-            DiagDir::DownLeft => 0..w+h-1,
-        };
-
-        for x in x_starts {
-            let mut diag_line = Vec::new();
-            for y in 0..h {
-                let src_x = match direction {
-                    DiagDir::DownRight => x + y,
-                    DiagDir::DownLeft => x - y,
-                };
-                let src_y = y;
-                if src_x >= 0 && src_x < w {
-                    diag_line.push(self.raw[src_y as usize][src_x as usize]);
-                }
-            }
-            diag.push( diag_line );
-        }
-        diag.into_iter()
-    }
-
-    pub fn row_iter( &self ) -> GridRowIter<Item> {
+    pub fn rows( &self ) -> GridRowIter<Item> {
         GridRowIter::new( &self, GridDir::Horizontal )
     }
 
-
-    pub fn col_iter( &self ) -> GridRowIter<Item> {
+    pub fn cols( &self ) -> GridRowIter<Item> {
         GridRowIter::new( &self, GridDir::Vertical )
     }
 
-
-    pub fn diag_se_iter( &self ) -> DiagIter<Item> {
+    pub fn diags_down_right( &self ) -> DiagIter<Item> {
         DiagIter::new( &self, DiagDir::DownRight )
     }
 
-    pub fn diag_sw_iter( &self ) -> DiagIter<Item> {
+    pub fn diags_down_left( &self ) -> DiagIter<Item> {
         DiagIter::new( &self, DiagDir::DownLeft )
     }
 }
@@ -162,7 +103,6 @@ enum DiagDir {
     DownRight,
     DownLeft,
 }
-
 
 pub struct DiagIter<'a, T:'a>
     where T : Copy + Debug + Display + FromStr
@@ -288,44 +228,3 @@ impl <'a,T> Iterator for GridRowIter<'a,T>
 
     }
 }
-
-
-
-
-//
-//
-// pub struct CornersIter<'a, T:'a>
-//     where T : Copy + Debug + Display + FromStr
-// {
-//     grid : &'a Grid<T>,
-//     index : usize,
-// }
-//
-// impl <'a,T:'a> CornersIter<'a,T>
-//     where T : Copy + Debug + Display + FromStr
-// {
-//     fn new( grid : &'a Grid<T> ) -> CornersIter<'a,T> {
-//         CornersIter {
-//             grid : grid,
-//             index : 0
-//         }
-//     }
-// }
-//
-// impl <'a,T> Iterator for CornersIter<'a,T>
-//     where T : Copy + Debug + Display + FromStr
-// {
-//     type Item = T;
-//
-//     fn next(&mut self) -> Option<T> {
-//         let r = match self.index {
-//             0 => Some(self.grid.raw[0][0]),
-//             1 => Some(self.grid.raw[self.grid.height()-1][0]),
-//             2 => Some(self.grid.raw[0][self.grid.width()-1]),
-//             3 => Some(self.grid.raw[self.grid.height()-1][self.grid.width()-1]),
-//             _ => None,
-//         };
-//         self.index += 1;
-//         r
-//     }
-// }
